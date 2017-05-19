@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+    <style>
+    .bar {
+      fill: steelblue;
+    }
+    .chart text {
+      fill: black;
+      font: 10px sans-sarif;
+      text-anchor: middle;
+    }
+    .chart-title {
+
+    }
+
+    .axis text {
+      font: 10px sans-serif;
+    }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    div.tooltip {
+      position: absolute;
+      text-align: center;
+      width: 130px;
+      height: 40px;
+      paddng: 5px;
+      font: 14px sans-serif;
+      background: gray;
+      border: 0px;
+      border-radius: 5px;
+      pointer-events: none;
+      font-weight: bold;
+    }
+
+
+    </style>
+</head>
+<body>
+
+  <svg class="chart">
+
+  </svg>
+  <script>
+  var newData = [];
+
+  var margin = {top: 20, right: 30, bottom: 30, left: 40},
+    width = 992 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom;
+
+
+  var x = d3.scale.ordinal()
+      .rangeRoundBands([0, width], .1);
+
+  var y = d3.scale.linear()
+      .range([height, 0]);
+
+
+//create an x Axis instance scaling to x variable
+
+
+
+      var yAxis = d3.svg.axis()
+          .scale(y)
+          .orient("left")
+          .ticks(10);
+
+    var chart = d3.select(".chart")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  var numbers = [];
+  var dates = [];
+  // Define the div for the tooltip
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+//append the x axis to the chart inside a g element
+
+
+
+  d3.json('https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json', function(data) {
+    newData = data.data;
+    console.log(data);
+
+    var thisData= [];
+    for(var i = 0; i < newData.length; i++) {
+      thisData.push(
+                  {
+                    dates: newData[i][0].substring(0, 4),
+                    numbers: newData[i][1]
+                    }
+                  );
+      // dates.push(newData[i][0])
+      // numbers.push(newData[i][1])
+
+    };
+    console.log(thisData);
+
+    x.domain(thisData.map(function(d) {return d.dates;}))
+    y.domain([0, d3.max(thisData, function(d) { return d.numbers;})])
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .tickValues(x.domain().filter(function(d, i) { return !(i % 2); }))
+        .orient('bottom')
+    // var barWidth = width / thisData.length;
+
+    chart.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(0,'+ height+')')
+        .call(xAxis);
+
+        chart.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+    chart.append('g')
+         .attr('class', 'y axis')
+         .call(yAxis)
+         .append('text')
+         .attr('transform', 'rotate(-90)')
+         .attr('y', 6)
+         .attr('dy', '.71em')
+         .style('text-anchor', 'end')
+         .text('Gross Domestic Product')
+
+    chart.append('g')
+         .attr('class', 'chart-title')
+         .append('text')
+         .attr('x', width/2)
+         .attr('y', height - 500)
+        //  .attr('dx', '3em')
+         .style('text-anchor', 'middle')
+         .style('font-size', '30px')
+         .text('Gross Domestic Product');
+
+            chart.selectAll(".bar")
+                .data(thisData)
+              .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d) { return x(d.dates); })
+                .attr("y", function(d) { return y(d.numbers); })
+                .attr("height", function(d) { return height - y(d.numbers); })
+                .attr("width", x.rangeBand())
+                .on('mouseover', function(d) {
+                  div.transition()
+                     .duration(200)
+                     .style('opacity', .9);
+                  div.html('$'+ d.numbers+ ' Billion'+'<br/>'+d.dates)
+                  .style('left', (d3.event.pageX) + 'px')
+                  .style('top', (d3.event.pageY - 28) + 'px');
+
+                })
+                .on('mouseout', function(d) {
+                  div.transition()
+                     .duration(500)
+                     .style('opacity', 0)
+                })
+  })
+
+
+
+
+
+  </script>
+
+</body>
+</html>
