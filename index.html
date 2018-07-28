@@ -8,6 +8,10 @@
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
     <style>
+    .chart-container {
+      width: 992px;
+      margin: 0 auto;
+    }
     .bar {
       fill: steelblue;
     }
@@ -16,10 +20,6 @@
       font: 10px sans-sarif;
       text-anchor: middle;
     }
-    .chart-title {
-
-    }
-
     .axis text {
       font: 10px sans-serif;
     }
@@ -48,10 +48,11 @@
     </style>
 </head>
 <body>
+  <div class="chart-container">
+    <svg class="chart">
 
-  <svg class="chart">
-
-  </svg>
+    </svg>
+  </div>
   <script>
   var newData = [];
 
